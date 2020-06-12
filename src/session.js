@@ -368,18 +368,22 @@ Session.prototype._process_incoming = function(msg, cb) {
 };
 
 // send a message to the session
-Session.prototype.send = function(msg, keep_set_fields) {
+Session.prototype.send = function(msg, keep_set_fields, ts) {
     var self = this;
 
     // set session specific headers
     msg.SenderCompID = self.sender_comp_id;
     msg.TargetCompID = self.target_comp_id;
 
-    if (!keep_set_fields || msg.SendingTime === undefined) {
+    if (!keep_set_fields && msg.SendingTime === undefined) {
         msg.SendingTime = new Date();
     }
 
-    self.last_outgoing_time = new Date().getTime();
+    if (!ts) {
+      self.last_outgoing_time = new Date().getTime();
+    } else {
+      self.last_outgoing_time = ts;
+    }
 
     // increment the next outgoing
     msg.MsgSeqNum = self.outgoing_seq_num++;
